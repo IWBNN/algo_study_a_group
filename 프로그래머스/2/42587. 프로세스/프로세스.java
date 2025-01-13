@@ -1,48 +1,36 @@
 import java.util.*;
 
 class Solution {
-    class Process {
-        int priority;
-        int location;
-        
-        Process(int priority, int location) {
-            this.priority = priority;
-            this.location = location;
-        }
-    }
-    
     public int solution(int[] priorities, int location) {
-        Queue<Process> queue = new LinkedList<>();
+        // 프로세스 위치와 우선순위 저장하는 큐
+        Queue<Integer> queue = new LinkedList<>();
+        // 우선순위 내림차순 정렬을 위한 우선순위 큐
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(Collections.reverseOrder());
         
-        // 프로세스를 큐에 넣기
+        // 큐에 위치 저장, 우선순위 큐에 우선순위 저장
         for (int i = 0; i < priorities.length; i++) {
-            queue.offer(new Process(priorities[i], i));
+            queue.offer(i);
+            priorityQueue.offer(priorities[i]);
         }
         
-        int order = 0;
+        int answer = 1;  // 실행 순서
         
         while (!queue.isEmpty()) {
-            Process current = queue.poll();
-            boolean hasHigherPriority = false;
+            int currentLocation = queue.poll();
             
-            // 현재 프로세스보다 우선순위가 높은 프로세스가 있는지 확인
-            for (Process p : queue) {
-                if (p.priority > current.priority) {
-                    hasHigherPriority = true;
-                    break;
+            // 현재 프로세스의 우선순위가 최대 우선순위와 같으면 실행
+            if (priorities[currentLocation] == priorityQueue.peek()) {
+                if (currentLocation == location) {
+                    return answer;
                 }
-            }
-            
-            if (hasHigherPriority) {
-                queue.offer(current);  // 다시 큐에 넣기
+                priorityQueue.poll();
+                answer++;
             } else {
-                order++;  // 실행 순서 증가
-                if (current.location == location) {
-                    return order;  // 찾는 프로세스라면 현재 순서 반환
-                }
+                // 아니면 큐의 맨 뒤로
+                queue.offer(currentLocation);
             }
         }
         
-        return order;
+        return answer;
     }
 }
